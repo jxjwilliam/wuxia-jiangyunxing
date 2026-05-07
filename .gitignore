@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual env
+.venv/
+venv/
+
+# Artifacts and data
+outputs/
+data/raw/
+data/processed/
+data/instructions/*.jsonl
+!data/instructions/.gitkeep
+
+# Notebook noise
+.ipynb_checkpoints/
+
+# Local env
+.env
+.cursor/mcp.json
+data/*.pdf
+.sisyphus/

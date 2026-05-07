@@ -1,0 +1,9 @@
+# Install CUDA version of paddlepaddle first:
+#   python -m pip install paddlepaddle-gpu -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
+paddleocr>=2.7.0
+pillow>=10.0.0
+opencv-python-headless>=4.8.0
+
+# Optional: image upscaling
+# basicsr>=1.4.2
+# realesrgan>=0.3.0
