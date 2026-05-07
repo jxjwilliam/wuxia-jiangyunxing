@@ -1,9 +1,21 @@
-# Install CUDA version of paddlepaddle first:
-#   python -m pip install paddlepaddle-gpu -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
-paddleocr>=2.7.0
-pillow>=10.0.0
-opencv-python-headless>=4.8.0
+# GPU / AutoDL — pinned to a working env (Python 3.12, PaddleOCR 3.5 + PaddleX, CUDA 13 driver).
+#
+# Install:
+#   python -m pip install -r requirements_gpu.txt
+#
+# paddlepaddle-gpu is not on PyPI; the line below adds Paddle's wheel index.
+# If install fails, try cu126 instead:
+#   https://www.paddlepaddle.org.cn/packages/stable/cu126/
 
-# Optional: image upscaling
+--extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu130/
+
+paddlepaddle-gpu==3.3.0
+paddleocr==3.5.0
+paddlex==3.5.1
+numpy==2.1.3
+pillow==12.2.0
+opencv-python-headless==4.13.0.92
+
+# Optional: image upscaling (uncomment on AutoDL if using upscale.py)
 # basicsr>=1.4.2
 # realesrgan>=0.3.0

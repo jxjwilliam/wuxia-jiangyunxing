@@ -75,9 +75,9 @@ Upload the zip files to an [AutoDL](https://autodl.com) GPU instance:
 
 ```bash
 # On local machine
-scp -P <port> crops_left.zip crops_right.zip \
+scp -P 52290 crops_left.zip crops_right.zip \
   main_autodl.py ocr_text.py config.py upscale.py \
-  root@<autodl-ip>:/root/
+  root@connect.westb.seetacloud.com:/root/
 
 # On AutoDL instance
 unzip crops_left.zip -d /root/wuxia_crops/
@@ -92,7 +92,7 @@ Estimated cost: ¥1-2 (~$0.15-0.30) on an RTX 4090 instance.
 
 ```bash
 # Download AutoDL results
-scp -P <port> -r root@<autodl-ip>:/root/wuxia_output/ ./tmp_results/
+scp -P 52290 -r root@connect.westb.seetacloud.com:/root/wuxia_output/ ./tmp_results/
 
 # Run final assembly
 python main_local.py --phase3

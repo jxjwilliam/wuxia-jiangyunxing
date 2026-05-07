@@ -33,4 +33,5 @@ tmp_results/
 crops_left.zip
 crops_right.zip
 wuxia_output.zip
+wuxia/
 .DS_Store
