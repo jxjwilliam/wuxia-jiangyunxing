@@ -39,3 +39,20 @@ I have a pdf, each page includes: left side text, right side image, as attached.
 
 - all others
 - '/skills' -> 'brainstorming' -> write plan -> ...
+
+## Why AutoDL for text extraction?
+
+The cloud GPU step is for **OCR** (reading Traditional Chinese from the **left** panel crops), not because PDF rasterisation or left/right splitting must run remotely.
+
+This repo uses **PaddleOCR** for Traditional Chinese (including vertical text). That stack is built around **NVIDIA GPU + CUDA**. On an **Apple Silicon Mac** (e.g. M3) there is no practical Paddle GPU path, so local OCR would be **CPU-only Paddle**—feasible but **much slower** on ~200 high-resolution crops—or you’d need a **different OCR engine**, often with **weaker fit** for this layout and script.
+
+So the split is intentional:
+
+| Where | Role |
+|--------|------|
+| **Local** | PDF → page images → left/right crops, packaging, OpenCC 繁→简, chapter detection, `wuxia/` assembly |
+| **AutoDL** | PaddleOCR on left crops (GPU), one `ocr_text.txt` per page |
+
+AutoDL is **pay-per-hour GPU**; for a one-off book run it is often cheaper in **elapsed time** than long CPU OCR on a laptop.
+
+If you switched to an OCR stack that runs fast locally on Apple Silicon without a cloud GPU, you could drop AutoDL—but you’d be trading **tooling fit** (PaddleOCR + GPU) for **local-only convenience**.
