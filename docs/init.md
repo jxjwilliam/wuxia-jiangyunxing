@@ -21,3 +21,21 @@ I have a pdf, each page includes: left side text, right side image, as attached.
 
 - pdf: data/jiang-yun-xing.pdf
 - implementation plan: docs/wuxia_extraction_plan.md
+
+
+## Folder/files are created so far
+
+### by me
+
+- docs/init.md
+- data/jiang-yun-xing.pdf
+
+### Cursor IDE
+
+- docs/wuxia_extraction_plan.md
+- docs/superpowers/specs/2026-05-07-wuxia-hybrid-ocr-only-v1-design.md
+
+### Opencode
+
+- all others
+- '/skills' -> 'brainstorming' -> write plan -> ...
