@@ -5,7 +5,7 @@ Extract paired text + illustration content from a Chinese wuxia comic PDF (`data
 ## Pipeline
 
 ```
-PDF (pages 6-214)
+PDF (pages 6-212)
     │
     ▼ [PyMuPDF]
 Page JPEGs (300 DPI)

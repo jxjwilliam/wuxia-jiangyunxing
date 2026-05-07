@@ -411,7 +411,7 @@ Test with 5 pages first:
 python main_autodl.py
 ```
 
-Verify OCR output in `/root/wuxia_output/`. If good, remove END_PAGE limit and run all 209 pages.
+Verify OCR output in `/root/wuxia_output/`. If good, remove END_PAGE limit and run all 207 pages.
 
 ### Step 5 — Download + Phase 3 Assembly
 
@@ -442,4 +442,4 @@ Verify OCR output in `/root/wuxia_output/`. If good, remove END_PAGE limit and r
 | Translation to Simplified works | `grep"简体" text.txt` for simplified chars | ☐ |
 | Title detection | `第九回_鐵槍破犁` folder should exist | ☐ |
 | Output structure | `wuxia/` has 35+ folders (one per chapter) | ☐ |
-| All 209 pages processed | Count files in `wuxia/` | ☐ |
+| All 207 pages processed | Count files in `wuxia/` | ☐ |

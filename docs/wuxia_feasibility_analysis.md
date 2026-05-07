@@ -42,14 +42,14 @@ This document evaluates whether the extraction pipeline can run on your **MacBoo
 | ③ OCR (Traditional Chinese) | PaddleOCR | ⚠️ **Problematic** | ✅✅ **Fast** (~2-3 min) | **AutoDL** (see §3 for details) |
 | ④ Translation (繁→简) | OpenCC | ✅ Negligible | ✅ Negligible | **Local** — instant, no GPU needed |
 | ⑤ Chapter title detection | regex | ✅ Negligible | ✅ Negligible | **Local** — pure string matching |
-| ⑥ Upscaling (optional) | Real-ESRGAN | ⚠️ **Slow/unstable** | ✅✅ **Fast** (~5-10 min for 209 img) | **AutoDL** (or skip) |
+| ⑥ Upscaling (optional) | Real-ESRGAN | ⚠️ **Slow/unstable** | ✅✅ **Fast** (~5-10 min for 207 img) | **AutoDL** (or skip) |
 | ⑦ File organization | Python | ✅ Negligible | ✅ Negligible | **Local** |
 
 ### 2.1 PyMuPDF + Pillow — Fully Local ✅
 
-These are pure CPU/memory operations. PyMuPDF renders pages at 300 DPI in ~0.3s/page. All 209 pages → ~1 minute. No GPU needed.
+These are pure CPU/memory operations. PyMuPDF renders pages at 300 DPI in ~0.3s/page. All 207 pages → ~1 minute. No GPU needed.
 
-The images are saved as JPEGs to `tmp_pages/` (~50-100 MB total for 209 pages at JPEG quality).
+The images are saved as JPEGs to `tmp_pages/` (~50-100 MB total for 207 pages at JPEG quality).
 
 ### 2.2 PaddleOCR — Problematic on Apple Silicon ⚠️
 
@@ -78,7 +78,7 @@ The images are saved as JPEGs to `tmp_pages/` (~50-100 MB total for 209 pages at
 
 If you prefer to run everything locally without AutoDL:
 
-| OCR Engine | M3 Support | Traditional Chinese | Vertical Text | Speed (per page) | Total (209 pages) |
+| OCR Engine | M3 Support | Traditional Chinese | Vertical Text | Speed (per page) | Total (207 pages) |
 |---|---|---|---|---|---|
 | **PaddleOCR-VL** (MLX) | ✅ Official | ✅ Good | ✅ Good | ~2-5s | ~7-17 min |
 | **EasyOCR** (CPU/PyTorch) | ✅ Works | ✅ Good | ✅ Good | ~5-15s | ~17-52 min |
@@ -90,8 +90,8 @@ If you prefer to run everything locally without AutoDL:
 
 ### 2.4 Real-ESRGAN — GPU Recommended ⚠️
 
-- **On M3 18GB:** Real-ESRGAN's MPS support is still experimental (unmerged PR [#902](https://github.com/xinntao/Real-ESRGAN/issues/902)). Running on CPU would be very slow — estimated 30-60 seconds per 2750×3750px image (hours for all 209).
-- **On AutoDL GPU (RTX 4090):** ~5-10 seconds per image, total ~20-30 min for 209 images.
+- **On M3 18GB:** Real-ESRGAN's MPS support is still experimental (unmerged PR [#902](https://github.com/xinntao/Real-ESRGAN/issues/902)). Running on CPU would be very slow — estimated 30-60 seconds per 2750×3750px image (hours for all 207).
+- **On AutoDL GPU (RTX 4090):** ~5-10 seconds per image, total ~20-30 min for 207 images.
 - **Alternative for local:** Pillow Lanczos upscale (2× is effectively free) if you just need larger dimensions without AI quality gain.
 
 **Real-ESRGAN is optional.** The 300 DPI rasterisation already gives ~2750×3750px illustrations which is sufficient for most image-to-video tools. Only use Real-ESRGAN if you need maximum quality.
@@ -128,7 +128,7 @@ Recommended if: **You want the fastest OCR with minimal cloud cost.**
   PDF → [PyMuPDF] → page JPEGs → [Pillow] → split L/R
 
 [UPLOAD to AutoDL]
-  left crops (209 images) → upload (~50 MB total)
+  left crops (207 images) → upload (~50 MB total)
 
 [AUTODL GPU]
   left crops → [PaddleOCR GPU] → raw text files (tiny)
@@ -173,17 +173,16 @@ Upload PDF to AutoDL → run full pipeline on GPU → download wuxia/ folder
 | RTX 3090 (24GB) | ~2-3 | 5-12 min | ¥0.3-0.6 (~$0.04-0.08) |
 | RTX 4060 Ti (16GB) | ~1-2 | 10-20 min | ¥0.2-0.7 (~$0.03-0.10) |
 
-**AutoDL billing:** Charged by the second, minimum 1 minute. Most instances cost ¥1-5/hr. A full OCR run (209 pages) on RTX 4090 costs **less than ¥1** ($0.15).
+**AutoDL billing:** Charged by the second, minimum 1 minute. Most instances cost ¥1-5/hr. A full OCR run (207 pages) on RTX 4090 costs **less than ¥1** ($0.15).
 
 ### Data Transfer
 
 | Data | Size | Upload time (50 Mbps) | Download time |
 |---|---|---|---|
 | PDF | 39 MB | ~6s | N/A |
-| Left crops (209 JPEGs) | ~50-100 MB | ~10-15s | N/A |
-| Right crops (209 JPEGs) | ~50-100 MB | ~10-15s | N/A |
-| OCR text output | ~200 KB | N/A | ~1s |
-| Upscaled illustrations (209 PNGs) | ~2-5 GB | N/A | ~5-15 min |
+| Left crops (207 JPEGs) | ~50-100 MB | ~10-15s | N/A |
+| Right crops (207 JPEGs) | ~50-100 MB | ~10-15s | N/A |
+| Upscaled illustrations (207 PNGs) | ~2-5 GB | N/A | ~5-15 min |
 
 > **Tip:** Only upload the PDF and do the page extraction ON AutoDL (Option C), or pre-extract + upload just the split halves (Option B — smaller, and you can verify the split quality locally first).
 
@@ -305,8 +304,8 @@ Phase 3 — AutoDL Setup (10 min)
 └── Upload split images (left/right crops)
 
 Phase 4 — GPU Processing (3-5 min on RTX 4090)
-├── Run PaddleOCR on all 209 left crops
-├── (Optional) Run Real-ESRGAN on all 209 right crops
+├── Run PaddleOCR on all 207 left crops
+├── (Optional) Run Real-ESRGAN on all 207 right crops
 └── Download results (text JSONs + upscaled images)
 
 Phase 5 — Local Assembly (1 min)
@@ -317,7 +316,7 @@ Phase 5 — Local Assembly (1 min)
 
 Phase 6 — Dry Run + Full Run
 ├── Test with 5 pages (6-10) first
-└── Full 209-page pipeline
+└── Full 207-page pipeline
 ```
 
 ### If Going Fully Local (Option A — PaddleOCR-VL with MLX)

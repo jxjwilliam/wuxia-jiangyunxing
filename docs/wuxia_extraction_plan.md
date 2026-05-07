@@ -17,7 +17,7 @@
 | Page size | 657 × 899 pts (single), 1315 × 899 pts (spreads) |
 | Page 1 | Cover — 657 × 899 (single width, skip) |
 | Pages 2–5 | Front matter — skip |
-| Pages 6–214 | Process — each is a 1315 × 899 JPEG spread |
+| Pages 6–212 | Process — each is a 1315 × 899 JPEG spread |
 | Embedded format | JPEG (one image per page) |
 | Text extractable | ❌ No — image-based, OCR needed |
 | Resolution | 72 PPI (low — upscaling recommended for image-to-video use) |
@@ -452,13 +452,13 @@ print(detect_title(sample, 6))  # expect: 第九回_鐵槍破犁
 
 **4. Dry run (pages 6–10 only):**
 Set `END_PAGE = 10` in config.py and run `main.py` to validate the full
-pipeline before committing to all 214 pages.
+pipeline before committing to all 207 pages.
 
 ---
 
 ## Performance Estimates
 
-| Step | Time per page | 209 pages total |
+| Step | Time per page | 207 pages total |
 |---|---|---|
 | PDF rasterisation (PyMuPDF) | ~0.3s | ~1 min |
 | Image split (Pillow) | ~0.1s | ~0.3 min |
@@ -528,7 +528,7 @@ generational quality loss when the AI tool re-encodes.
 7. `organise.py` — trivial
 8. `main.py` — wire it all together
 9. Dry run on pages 6–10
-10. Full run on all 209 pages
+10. Full run on all 207 pages
 
 ---
 

@@ -4,7 +4,7 @@
 PDF_PATH = "data/jiang-yun-xing.pdf"
 OUTPUT_DIR = "wuxia"
 START_PAGE = 6           # 1-indexed; pages 1-5 are skipped (cover + front matter)
-END_PAGE = None          # None = process to end of PDF
+END_PAGE = -2            # None = process to end; negative = skip N pages from end
 
 # Page split: ratio of left/right (0.5 = exact midpoint)
 # Adjust if text/illustration boundary is off-centre

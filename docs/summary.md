@@ -35,8 +35,8 @@ The pipeline is split into 3 phases to maximize efficiency — CPU-bound work ru
 
 ## Phase 1 Results
 
-- **209 pages** extracted at 300 DPI (~0.5s per page)
-- **418 crop files** (209 text + 209 illustration)
+- **207 pages** extracted at 300 DPI (~0.5s per page)
+- **414 crop files** (207 text + 207 illustration)
 - `crops_left.zip` — **374 MB** (text panels for OCR)
 - `crops_right.zip` — **599 MB** (illustration panels)
 

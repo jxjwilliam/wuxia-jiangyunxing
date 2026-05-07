@@ -12,7 +12,9 @@ def extract_pages(tmp_dir: Path):
     tmp_dir.mkdir(parents=True, exist_ok=True)
     results = []
 
-    end = END_PAGE or len(doc)
+    end = len(doc)
+    if END_PAGE is not None:
+        end = len(doc) + END_PAGE if END_PAGE < 0 else END_PAGE
     for page_num in range(START_PAGE - 1, end):  # fitz is 0-indexed
         page = doc[page_num]
         # Scale to target DPI (native PDF is 72 PPI)
