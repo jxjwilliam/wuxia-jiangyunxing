@@ -424,6 +424,15 @@ Verify OCR output in `/root/wuxia_output/`. If good, remove END_PAGE limit and r
 
 ---
 
+## Related Documents
+
+- [Implementation Plan](./wuxia_extraction_plan.md) — Original full pipeline design
+- [Feasibility Analysis](./wuxia_feasibility_analysis.md) — Local M3 vs AutoDL GPU analysis
+- [Implementation Summary](./summary.md) — Brief project summary
+- [README](../README.md) — Project overview
+
+---
+
 ## Verification Checklist
 
 | Check | How | Pass/Fail |

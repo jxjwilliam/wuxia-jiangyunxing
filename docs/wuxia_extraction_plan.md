@@ -508,6 +508,15 @@ generational quality loss when the AI tool re-encodes.
 
 ---
 
+## Related Documents
+
+- [Feasibility Analysis](./wuxia_feasibility_analysis.md) — Local M3 vs AutoDL GPU analysis
+- [Hybrid Implementation Plan](./wuxia_hybrid_impl_plan.md) — Hybrid local + cloud implementation
+- [Implementation Summary](./summary.md) — Brief project summary
+- [README](../README.md) — Project overview
+
+---
+
 ## Recommended Build Order
 
 1. `config.py` — set all paths and flags

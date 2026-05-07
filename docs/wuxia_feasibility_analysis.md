@@ -347,6 +347,15 @@ If you later want to run everything locally, switch to PaddleOCR-VL with MLX —
 
 ---
 
+## Related Documents
+
+- [Implementation Plan](./wuxia_extraction_plan.md) — Original full pipeline design
+- [Hybrid Implementation Plan](./wuxia_hybrid_impl_plan.md) — Detailed hybrid workflow
+- [Implementation Summary](./summary.md) — Brief project summary
+- [README](../README.md) — Project overview
+
+---
+
 ## Appendix: Useful Commands
 
 ### Check PaddlePaddle Apple Silicon Compatibility
