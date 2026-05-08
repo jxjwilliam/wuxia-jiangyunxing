@@ -6,7 +6,7 @@ Processes: OCR on left crops only (ocr_only_v1).
 import sys
 from pathlib import Path
 from PIL import Image
-from configs.config import AUTODL_REMOTE_DIR, AUTODL_OUTPUT_DIR
+from configs.config import AUTODL_REMOTE_DIR, AUTODL_OUTPUT_DIR, OCR_OUTPUT_SIMPLIFIED, OPENCC_CONFIG
 
 CROPS_DIR = Path(AUTODL_REMOTE_DIR)
 OUT_DIR = Path(AUTODL_OUTPUT_DIR)
@@ -14,6 +14,14 @@ OUT_DIR = Path(AUTODL_OUTPUT_DIR)
 
 def phase2_gpu():
     from ocr_text import ocr_image
+    opencc = None
+    if OCR_OUTPUT_SIMPLIFIED:
+        try:
+            from opencc import OpenCC
+            opencc = OpenCC(OPENCC_CONFIG)
+            print("  → OpenCC enabled: OCR output will be converted to Simplified Chinese.")
+        except Exception:
+            print("  ⚠️ OpenCC not available on this environment; keep Traditional OCR output.")
 
     print("=" * 50)
     print("PHASE 2: AutoDL GPU Processing")
@@ -60,6 +68,8 @@ def phase2_gpu():
         print(f"  OCR page {page_num}...", end=" ", flush=True)
         with Image.open(left_path) as left_img:
             text = ocr_image(left_img)
+        if opencc is not None:
+            text = opencc.convert(text)
         (page_dir / "ocr_text.txt").write_text(text, encoding="utf-8")
         print("done")
 

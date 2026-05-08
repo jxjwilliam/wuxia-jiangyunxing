@@ -15,7 +15,9 @@ OUTPUT_SUBDIR = "output"
 
 # OCR (works on both local M3 and AutoDL GPU)
 OCR_LANG = "chinese_cht"
-OCR_USE_GPU = False
+OCR_USE_GPU = True
+OCR_RETRY_WITH_ENHANCEMENT = True
+OCR_OUTPUT_SIMPLIFIED = True
 
 # Translation (Traditional → Simplified Chinese)
 OPENCC_CONFIG = "t2s"

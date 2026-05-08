@@ -80,9 +80,9 @@ Upload the zip to an [AutoDL](https://autodl.com) GPU instance:
 ```bash
 $ GIT_TERMINAL_PROMPT=0 git -c http.version=HTTP/1.1 clone --depth 1 https://github.com/jxjwilliam/wuxia-jiangyunxing.git
 $ scp -P 52290 work/jiang-yun-xing/crops_left.zip root@connect.westb.seetacloud.com:/root/
-$ zip -o crops_left.zip -d /root/wuxia_crops/
+$ unzip -o crops_left.zip -d /root/wuxia_crops/
 
-$ pip install paddlepaddle-gpu paddleocr pillow
+$ python -m pip install -r requirements_rtx-4090.txt
 $ python main_autodl.py
 ```
 
@@ -108,7 +108,7 @@ $ pip install pymupdf pillow opencc-python-reimplemented
 
 **AutoDL GPU:**
 ```
-pip install paddlepaddle-gpu paddleocr pillow
+python -m pip install -r requirements_rtx-4090.txt
 # Optional: pip install basicsr realesrgan opencv-python-headless
 ```
 

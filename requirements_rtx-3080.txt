@@ -1,7 +1,7 @@
 # GPU / AutoDL — pinned to a working env (Python 3.12, PaddleOCR 3.5 + PaddleX, RTX 4090).
 #
 # Install:
-#   python -m pip install -r requirements_gpu.txt
+#   python -m pip install -r requirements_rtx-3080.txt
 #
 # paddlepaddle-gpu is not on PyPI; the line below adds Paddle's wheel index.
 # For CUDA 12.4 driver/image, prefer cu123 wheels (driver is backward compatible).
@@ -16,6 +16,7 @@ paddlex==3.5.1
 numpy==2.1.3
 pillow==12.2.0
 opencv-python-headless==4.13.0.92
+opencc-python-reimplemented>=0.1.7
 
 # Optional: image upscaling (uncomment on AutoDL if using upscale.py)
 # basicsr>=1.4.2
