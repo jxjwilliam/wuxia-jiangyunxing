@@ -38,6 +38,11 @@ def phase2_gpu():
         page_num = parts[1]
         side = parts[2]
         if side == "left":
+            if page_num in left_pages:
+                print(
+                    f"⚠️  Duplicate left crop for page_{page_num}: "
+                    f"{left_pages[page_num].name} → using {f.name}"
+                )
             left_pages[page_num] = f
 
     if not left_pages:
@@ -47,14 +52,14 @@ def phase2_gpu():
 
     print(f"\nProcessing OCR for {len(left_pages)} pages...")
 
-    for page_num in sorted(left_pages.keys()):
+    for page_num in sorted(left_pages.keys(), key=int):
         page_dir = OUT_DIR / f"page_{page_num}"
         page_dir.mkdir(exist_ok=True)
 
         left_path = left_pages[page_num]
         print(f"  OCR page {page_num}...", end=" ", flush=True)
-        left_img = Image.open(left_path)
-        text = ocr_image(left_img)
+        with Image.open(left_path) as left_img:
+            text = ocr_image(left_img)
         (page_dir / "ocr_text.txt").write_text(text, encoding="utf-8")
         print("done")
 
@@ -65,7 +70,7 @@ def phase2_gpu():
         "  # Then on local machine:\n"
         "  scp -P <port> root@<ip>:/root/wuxia_output.zip ./\n"
         "  unzip wuxia_output.zip -d tmp_results/\n"
-        "  python main_local.py --phase3"
+        "  python main_local.py --book <same-pdf-as-phase1> --phase3"
     )
     print(cmds)
 
