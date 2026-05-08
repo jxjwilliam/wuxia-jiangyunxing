@@ -6,7 +6,12 @@ Runs on AutoDL with GPU, or locally on M3 (see config).
 from paddleocr import PaddleOCR
 from PIL import Image
 import numpy as np
-from configs.config import OCR_LANG, OCR_USE_GPU, OCR_RETRY_WITH_ENHANCEMENT
+from configs.config import (
+    OCR_DET_LIMIT_SIDE_LEN,
+    OCR_LANG,
+    OCR_RETRY_WITH_ENHANCEMENT,
+    OCR_USE_GPU,
+)
 
 
 _ocr = None
@@ -159,12 +164,30 @@ def get_ocr():
         # PaddleOCR constructor args changed across versions (pipelines API: device=, not use_gpu=).
         # Try modern args first, then legacy.
         dev = "gpu" if OCR_USE_GPU else "cpu"
+        det_kw: dict = {}
+        if OCR_DET_LIMIT_SIDE_LEN and int(OCR_DET_LIMIT_SIDE_LEN) > 0:
+            det_kw["det_limit_side_len"] = int(OCR_DET_LIMIT_SIDE_LEN)
+
         candidates = [
-            dict(lang=OCR_LANG, use_angle_cls=True, device=dev, show_log=False),
-            dict(lang=OCR_LANG, use_angle_cls=True, show_log=False),
-            dict(lang=OCR_LANG, show_log=False),
-            dict(lang=OCR_LANG, use_angle_cls=True, use_gpu=OCR_USE_GPU, show_log=False),
+            dict(lang=OCR_LANG, use_angle_cls=True, device=dev, show_log=False, **det_kw),
+            dict(lang=OCR_LANG, use_angle_cls=True, show_log=False, **det_kw),
+            dict(lang=OCR_LANG, show_log=False, **det_kw),
+            dict(
+                lang=OCR_LANG,
+                use_angle_cls=True,
+                use_gpu=OCR_USE_GPU,
+                show_log=False,
+                **det_kw,
+            ),
         ]
+        # If det_limit_side_len is unsupported, retry without it.
+        candidates.append(
+            dict(lang=OCR_LANG, use_angle_cls=True, device=dev, show_log=False)
+        )
+        candidates.append(
+            dict(lang=OCR_LANG, use_angle_cls=True, use_gpu=OCR_USE_GPU, show_log=False)
+        )
+
         last_err = None
         for kwargs in candidates:
             try:

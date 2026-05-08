@@ -18,6 +18,8 @@ OCR_LANG = "chinese_cht"
 OCR_USE_GPU = True
 OCR_RETRY_WITH_ENHANCEMENT = True
 OCR_OUTPUT_SIMPLIFIED = True
+# Larger than default 960: 300 DPI left crops are tall; too-small limit hurts vertical 繁体.
+OCR_DET_LIMIT_SIDE_LEN = 2048
 
 # Translation (Traditional → Simplified Chinese)
 OPENCC_CONFIG = "t2s"

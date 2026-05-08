@@ -82,9 +82,12 @@ $ GIT_TERMINAL_PROMPT=0 git -c http.version=HTTP/1.1 clone --depth 1 https://git
 $ scp -P 52290 work/jiang-yun-xing/crops_left.zip root@connect.westb.seetacloud.com:/root/
 $ unzip -o crops_left.zip -d /root/wuxia_crops/
 
+$ cd wuxia-jiangyunxing
 $ python -m pip install -r requirements_rtx-4090.txt
 $ python main_autodl.py
 ```
+
+Run Phase 2 from the **repository root** that contains `configs/` and `main_autodl.py` (not a renamed copy without updates). If you see `OpenCC not available`, install: `python -m pip install opencc-python-reimplemented`.
 
 Estimated cost: ¥1-2 (~$0.15-0.30) on an RTX 4090 instance.
 

@@ -3,10 +3,14 @@ Phase 2: AutoDL GPU Orchestrator.
 Run this on the AutoDL GPU instance after uploading split crops.
 Processes: OCR on left crops only (ocr_only_v1).
 """
+import os
 import sys
 from pathlib import Path
 from PIL import Image
 from configs.config import AUTODL_REMOTE_DIR, AUTODL_OUTPUT_DIR, OCR_OUTPUT_SIMPLIFIED, OPENCC_CONFIG
+
+# Reduces Paddle/OpenBLas multi-thread warnings and occasional instability on GPU nodes.
+os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 CROPS_DIR = Path(AUTODL_REMOTE_DIR)
 OUT_DIR = Path(AUTODL_OUTPUT_DIR)
@@ -18,10 +22,15 @@ def phase2_gpu():
     if OCR_OUTPUT_SIMPLIFIED:
         try:
             from opencc import OpenCC
+
             opencc = OpenCC(OPENCC_CONFIG)
             print("  → OpenCC enabled: OCR output will be converted to Simplified Chinese.")
-        except Exception:
-            print("  ⚠️ OpenCC not available on this environment; keep Traditional OCR output.")
+        except Exception as e:
+            print(
+                "  ⚠️ OpenCC not available; OCR stays Traditional. Install:\n"
+                "     python -m pip install opencc-python-reimplemented"
+            )
+            print(f"     ({type(e).__name__}: {e})")
 
     print("=" * 50)
     print("PHASE 2: AutoDL GPU Processing")
