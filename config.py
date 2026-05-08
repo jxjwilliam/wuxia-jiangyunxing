@@ -23,7 +23,7 @@ IMAGE_DPI = 300             # DPI for page rasterisation (72 PPI native → upsc
 
 # Upscaling (optional — AutoDL only; requires realesrgan)
 UPSCALE_ENABLED = False
-UPSCALE_FACTOR = 4          # 2× or 4×
+UPSCALE_FACTOR = 4          # Must stay 4 for bundled RealESRGAN_x4plus_anime_6B weights (see upscale.py)
 
 # Fallback folder name when no chapter title detected
 FOLDER_FALLBACK = "page_{page_num:03d}"
