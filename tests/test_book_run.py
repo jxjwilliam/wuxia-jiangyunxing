@@ -69,6 +69,23 @@ class TestLoadBookOverrides(unittest.TestCase):
             self.assertEqual(o["split_ratio"], 0.48)
             self.assertNotIn("end_page", o)
 
+    def test_ocr_left_crop_override(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            d = root / "data"
+            d.mkdir(parents=True)
+            pdf = d / "crop.pdf"
+            pdf.write_bytes(b"x")
+            cfg_dir = root / "configs" / "books"
+            cfg_dir.mkdir(parents=True)
+            side = cfg_dir / "crop.json"
+            side.write_text(
+                json.dumps({"ocr_left_crop": {"top": 0.12, "left": 0.2}}),
+                encoding="utf-8",
+            )
+            run = book_run.build_resolved_run(pdf, cwd=root)
+            self.assertEqual(run.ocr_left_crop, {"top": 0.12, "left": 0.2})
+
     def test_legacy_data_sidecar_fallback(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -103,6 +120,7 @@ class TestBuildResolvedRunLayout(unittest.TestCase):
             self.assertEqual(run.tmp_results, root / "work" / "jiang" / "tmp_results")
             self.assertEqual(run.output_dir, root / "work" / "jiang" / "output")
             self.assertEqual(run.crops_zip, root / "work" / "jiang" / "crops_left.zip")
+            self.assertIsNone(run.ocr_left_crop)
 
 
 if __name__ == "__main__":

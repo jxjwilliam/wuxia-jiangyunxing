@@ -3,5 +3,11 @@
   "output_dir": "work/41-定军山/output",
   "start_page": 7,
   "end_page": -4,
-  "split_ratio": 0.20
+  "split_ratio": 0.20,
+  "ocr_left_crop": {
+    "top": 0.17,
+    "left": 0.27,
+    "right": 0.06,
+    "bottom": 0.03
+  }
 }

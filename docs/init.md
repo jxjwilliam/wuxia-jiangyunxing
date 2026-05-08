@@ -56,3 +56,9 @@ So the split is intentional:
 AutoDL is **pay-per-hour GPU**; for a one-off book run it is often cheaper in **elapsed time** than long CPU OCR on a laptop.
 
 If you switched to an OCR stack that runs fast locally on Apple Silicon without a cloud GPU, you could drop AutoDL—but you’d be trading **tooling fit** (PaddleOCR + GPU) for **local-only convenience**.
+
+```text
+scp -P 46840 work/01-桃园结义/crops_left.zip  root@connect.cqa1.seetacloud.com:/root/
+scp -P 46840 work/14-煮酒论英雄/crops_left.zip  root@connect.cqa1.seetacloud.com:/root/
+scp -P 46840 work/41-定军山/crops_left.zip  root@connect.cqa1.seetacloud.com:/root/
+```

@@ -49,6 +49,7 @@ class BookRuntimeConfig:
     tmp_results: Path
     output_dir: Path
     crops_zip: Path
+    ocr_left_crop: dict[str, float | int] | None
 
 
 def sanitize_slug(stem: str) -> str:
@@ -119,6 +120,9 @@ def build_book_runtime_config(book: str, *, cwd: Path | None = None) -> BookRunt
     end_raw = overrides.get("end_page", END_PAGE)
     end_page = None if end_raw is None else int(end_raw)
     split_ratio = float(overrides.get("split_ratio", SPLIT_RATIO))
+    ocr_left_crop = overrides.get("ocr_left_crop")
+    if ocr_left_crop is not None and not isinstance(ocr_left_crop, dict):
+        raise ValueError("ocr_left_crop must be a JSON object when provided")
 
     return BookRuntimeConfig(
         pdf_path=resolved_pdf,
@@ -132,4 +136,5 @@ def build_book_runtime_config(book: str, *, cwd: Path | None = None) -> BookRunt
         tmp_results=work_root / "tmp_results",
         output_dir=output_dir,
         crops_zip=work_root / "crops_left.zip",
+        ocr_left_crop=ocr_left_crop,
     )

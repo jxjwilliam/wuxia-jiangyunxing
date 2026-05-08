@@ -78,15 +78,12 @@ Artifacts: `work/jiang-yun-xing/tmp_pages/`, `work/jiang-yun-xing/tmp_crops/`, `
 Upload the zip to an [AutoDL](https://autodl.com) GPU instance:
 
 ```bash
-# On local machine — use this book’s zip path, e.g.:
-scp -P 52290 work/jiang-yun-xing/crops_left.zip \
-  main_autodl.py ocr_text.py configs/config.py upscale.py \
-  root@connect.westb.seetacloud.com:/root/
+$ GIT_TERMINAL_PROMPT=0 git -c http.version=HTTP/1.1 clone --depth 1 https://github.com/jxjwilliam/wuxia-jiangyunxing.git
+$ scp -P 52290 work/jiang-yun-xing/crops_left.zip root@connect.westb.seetacloud.com:/root/
+$ zip -o crops_left.zip -d /root/wuxia_crops/
 
-# On AutoDL instance
-unzip -o crops_left.zip -d /root/wuxia_crops/
-pip install paddlepaddle-gpu paddleocr pillow
-python main_autodl.py
+$ pip install paddlepaddle-gpu paddleocr pillow
+$ python main_autodl.py
 ```
 
 Estimated cost: ¥1-2 (~$0.15-0.30) on an RTX 4090 instance.
@@ -105,8 +102,8 @@ Output: `work/jiang-yun-xing/output/<chapter>/` with `text.txt` + `illustration.
 ## Dependencies
 
 **Local:**
-```
-pip install pymupdf pillow opencc-python-reimplemented
+```bash
+$ pip install pymupdf pillow opencc-python-reimplemented
 ```
 
 **AutoDL GPU:**

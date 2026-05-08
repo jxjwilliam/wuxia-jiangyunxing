@@ -3,5 +3,11 @@
   "output_dir": "work/01-桃园结义/output",
   "start_page": 7,
   "end_page": -3,
-  "split_ratio": 0.20
+  "split_ratio": 0.20,
+  "ocr_left_crop": {
+    "top": 0.13,
+    "left": 0.22,
+    "right": 0.02,
+    "bottom": 0.02
+  }
 }

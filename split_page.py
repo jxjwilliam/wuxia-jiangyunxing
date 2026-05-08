@@ -12,3 +12,32 @@ def split_page(image_path, split_ratio: float | None = None) -> tuple:
         left = img.crop((0, 0, mid, h)).copy()
         right = img.crop((mid, 0, w, h)).copy()
     return left, right
+
+
+def apply_crop_margins(
+    img: Image.Image, crop_rule: dict[str, float | int] | None
+) -> Image.Image:
+    """Crop margins from an image using per-side ratio or pixel values."""
+    if not crop_rule:
+        return img
+
+    w, h = img.size
+
+    def _as_px(value, total: int) -> int:
+        if value is None:
+            return 0
+        v = float(value)
+        if 0.0 <= v < 1.0:
+            return int(total * v)
+        return max(0, int(v))
+
+    left = _as_px(crop_rule.get("left"), w)
+    right = _as_px(crop_rule.get("right"), w)
+    top = _as_px(crop_rule.get("top"), h)
+    bottom = _as_px(crop_rule.get("bottom"), h)
+
+    x0 = min(max(0, left), w - 1)
+    y0 = min(max(0, top), h - 1)
+    x1 = max(x0 + 1, min(w, w - right))
+    y1 = max(y0 + 1, min(h, h - bottom))
+    return img.crop((x0, y0, x1, y1)).copy()

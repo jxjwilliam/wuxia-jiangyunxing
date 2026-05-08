@@ -78,7 +78,7 @@ def _phase1_pages(run: book_run.ResolvedRun, *, start_step: int):
 
 def phase1_preprocess(run: book_run.ResolvedRun, *, book_arg: str, start_step: int = 1):
     """Extract PDF pages and split into left/right crops."""
-    from split_page import split_page
+    from split_page import split_page, apply_crop_margins
 
     print("=" * 50)
     print("PHASE 1: Local Preprocessing")
@@ -91,6 +91,7 @@ def phase1_preprocess(run: book_run.ResolvedRun, *, book_arg: str, start_step: i
     run.tmp_crops.mkdir(parents=True, exist_ok=True)
     for page_num, img_path in pages:
         left_img, right_img = split_page(img_path, split_ratio=run.split_ratio)
+        left_img = apply_crop_margins(left_img, run.ocr_left_crop)
         left_path = run.tmp_crops / f"page_{page_num:03d}_left.jpg"
         right_path = run.tmp_crops / f"page_{page_num:03d}_right.jpg"
         left_img.save(left_path, "JPEG", quality=95)

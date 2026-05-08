@@ -32,6 +32,7 @@ class ResolvedRun:
     tmp_results: Path
     output_dir: Path
     crops_zip: Path
+    ocr_left_crop: dict[str, float | int] | None
 
 
 def build_resolved_run(pdf_path: Path, *, cwd: Path | None = None) -> ResolvedRun:
@@ -48,4 +49,5 @@ def build_resolved_run(pdf_path: Path, *, cwd: Path | None = None) -> ResolvedRu
         tmp_results=runtime.tmp_results,
         output_dir=runtime.output_dir,
         crops_zip=runtime.crops_zip,
+        ocr_left_crop=runtime.ocr_left_crop,
     )
