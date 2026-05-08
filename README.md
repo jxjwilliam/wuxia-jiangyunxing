@@ -89,6 +89,8 @@ $ python main_autodl.py
 
 Run Phase 2 from the **repository root** that contains `configs/` and `main_autodl.py` (not a renamed copy without updates). If you see `OpenCC not available`, install: `python -m pip install opencc-python-reimplemented`.
 
+连环画一类 **竖排长条左栏**：Phase 1 会在 `tmp_crops/` 写入 `phase2_manifest.json`，并打进 `crops_left.zip`。AutoDL 解压后 `main_autodl.py` 会按此书配置做 **左旋图顺时针 90° + 横行阅读排序**，明显改善乱字、碎片行。此书开关在 **`configs/books/<stem>.json`** 里的 `ocr_rotate_left_cw90`（例如 `01-桃园结义` / `jiang-yun-xing` 未开启则不加此项）。改过该项或刚拉了新代码后，务必 **本地重跑 Phase 1 再打 zip**，不要只上传旧 crops。
+
 Estimated cost: ¥1-2 (~$0.15-0.30) on an RTX 4090 instance.
 
 ### Phase 3 — Assemble (local)

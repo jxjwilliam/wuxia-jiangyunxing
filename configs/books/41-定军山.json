@@ -9,5 +9,6 @@
     "left": 0.27,
     "right": 0.06,
     "bottom": 0.03
-  }
+  },
+  "ocr_rotate_left_cw90": true
 }

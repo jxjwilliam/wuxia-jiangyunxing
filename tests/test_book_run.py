@@ -121,6 +121,23 @@ class TestBuildResolvedRunLayout(unittest.TestCase):
             self.assertEqual(run.output_dir, root / "work" / "jiang" / "output")
             self.assertEqual(run.crops_zip, root / "work" / "jiang" / "crops_left.zip")
             self.assertIsNone(run.ocr_left_crop)
+            self.assertFalse(run.ocr_rotate_left_cw90)
+
+    def test_ocr_rotate_left_cw90_from_sidecar(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            data = root / "data"
+            data.mkdir(parents=True)
+            pdf = data / "spin.pdf"
+            pdf.write_bytes(b"x")
+            cfg_dir = root / "configs" / "books"
+            cfg_dir.mkdir(parents=True)
+            (cfg_dir / "spin.json").write_text(
+                json.dumps({"ocr_rotate_left_cw90": True}),
+                encoding="utf-8",
+            )
+            run = book_run.build_resolved_run(pdf, cwd=root)
+            self.assertTrue(run.ocr_rotate_left_cw90)
 
 
 if __name__ == "__main__":

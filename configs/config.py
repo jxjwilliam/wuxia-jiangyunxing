@@ -39,6 +39,9 @@ FOLDER_FALLBACK = "page_{page_num:03d}"
 AUTODL_REMOTE_DIR = "/root/wuxia_crops"
 AUTODL_OUTPUT_DIR = "/root/wuxia_output"
 
+# Written into tmp_crops/ and packaged in crops_left.zip for Phase 2 on AutoDL.
+PHASE2_MANIFEST_NAME = "phase2_manifest.json"
+
 
 @dataclass(frozen=True)
 class BookRuntimeConfig:
@@ -54,6 +57,19 @@ class BookRuntimeConfig:
     output_dir: Path
     crops_zip: Path
     ocr_left_crop: dict[str, float | int] | None
+    ocr_rotate_left_cw90: bool
+
+
+def write_phase2_manifest(tmp_crops: Path, *, ocr_rotate_left_cw90: bool) -> None:
+    """Drop AutoDL Phase 2 hints next to left crops so the zip carries book-specific OCR behavior."""
+    path = tmp_crops / PHASE2_MANIFEST_NAME
+    if ocr_rotate_left_cw90:
+        path.write_text(
+            json.dumps({"ocr_rotate_left_cw90": True}, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+    elif path.is_file():
+        path.unlink()
 
 
 def sanitize_slug(stem: str) -> str:
@@ -127,6 +143,7 @@ def build_book_runtime_config(book: str, *, cwd: Path | None = None) -> BookRunt
     ocr_left_crop = overrides.get("ocr_left_crop")
     if ocr_left_crop is not None and not isinstance(ocr_left_crop, dict):
         raise ValueError("ocr_left_crop must be a JSON object when provided")
+    ocr_rotate_left_cw90 = bool(overrides.get("ocr_rotate_left_cw90", False))
 
     return BookRuntimeConfig(
         pdf_path=resolved_pdf,
@@ -141,4 +158,5 @@ def build_book_runtime_config(book: str, *, cwd: Path | None = None) -> BookRunt
         output_dir=output_dir,
         crops_zip=work_root / "crops_left.zip",
         ocr_left_crop=ocr_left_crop,
+        ocr_rotate_left_cw90=ocr_rotate_left_cw90,
     )

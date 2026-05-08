@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 import book_run
+from configs.config import write_phase2_manifest
 
 
 def _extract_page_num(name: str) -> int | None:
@@ -97,6 +98,10 @@ def phase1_preprocess(run: book_run.ResolvedRun, *, book_arg: str, start_step: i
         left_img.save(left_path, "JPEG", quality=95)
         right_img.save(right_path, "JPEG", quality=95)
     print(f"  → {len(pages)} pairs saved to {run.tmp_crops}/")
+
+    write_phase2_manifest(run.tmp_crops, ocr_rotate_left_cw90=run.ocr_rotate_left_cw90)
+    if run.ocr_rotate_left_cw90:
+        print("  → phase2_manifest.json: ocr_rotate_left_cw90 (for AutoDL vertical text)")
 
     print("\nStep 3: Packaging crops for AutoDL upload...")
     from prepare_upload import prepare_upload
