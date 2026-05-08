@@ -1,6 +1,6 @@
 from pathlib import Path
 from PIL import Image
-from config import IMAGE_FORMAT
+from configs.config import IMAGE_FORMAT
 
 
 def save_pair(folder_name: str, text: str, illustration_img: Image.Image | None, output_dir: Path):

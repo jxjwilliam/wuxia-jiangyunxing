@@ -5,6 +5,7 @@ import io
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from PIL import Image
 
@@ -21,6 +22,23 @@ class TestExtractPageNum(unittest.TestCase):
     def test_invalid(self):
         self.assertIsNone(main_local._extract_page_num("page_foo_left"))
         self.assertIsNone(main_local._extract_page_num("nope"))
+
+
+class TestExistingExtractedPages(unittest.TestCase):
+    def test_reads_existing_page_jpgs(self):
+        with tempfile.TemporaryDirectory() as td:
+            d = Path(td)
+            (d / "page_007.jpg").write_bytes(b"x")
+            (d / "page_008.jpg").write_bytes(b"x")
+            (d / "not-a-page.jpg").write_bytes(b"x")
+            pages = main_local._existing_extracted_pages(d)
+        self.assertEqual([n for n, _ in pages], [7, 8])
+
+    def test_returns_empty_when_no_pages_exist(self):
+        with tempfile.TemporaryDirectory() as td:
+            d = Path(td)
+            pages = main_local._existing_extracted_pages(d)
+        self.assertEqual(pages, [])
 
 
 class TestResolveUniqueFolderName(unittest.TestCase):
@@ -69,6 +87,15 @@ class TestSplitPage(unittest.TestCase):
         left, right = split_page.split_page(buf)
         self.assertEqual(left.size, (50, 40))
         self.assertEqual(right.size, (50, 40))
+
+    def test_disables_pillow_pixel_guard_for_trusted_pdf_pages(self):
+        with patch.object(split_page.Image, "MAX_IMAGE_PIXELS", 12345):
+            img = Image.new("RGB", (100, 40), color=(255, 0, 0))
+            buf = io.BytesIO()
+            img.save(buf, format="PNG")
+            buf.seek(0)
+            split_page.split_page(buf)
+            self.assertIsNone(split_page.Image.MAX_IMAGE_PIXELS)
 
 
 if __name__ == "__main__":

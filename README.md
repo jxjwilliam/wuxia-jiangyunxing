@@ -2,7 +2,7 @@
 
 Extract paired text + illustration content from Chinese comic PDFs in `data/`. Each page has Traditional Chinese text on the left and art on the right — split, OCR (GPU), translate to Simplified Chinese, and save chapter folders.
 
-**Multi-book:** Every local run requires **`--book`** (basename under `data/` or path to `.pdf`). Temps and outputs go under **`work/<slug>/`** (slug = sanitized PDF stem). Optional overrides: **`data/<stem>.book.json`** with keys such as `start_page`, `end_page`, `split_ratio`.
+**Multi-book:** Every local run requires **`--book`** (basename under `data/` or path to `.pdf`). `configs/config.py` is the single loader that reads **`configs/books/<stem>.json`**, merges per-book values (e.g. `pdf_path`, `output_dir`, `start_page`, `end_page`, `split_ratio`) with common defaults, then runtime uses the merged config.
 
 ## Pipeline
 
@@ -32,8 +32,8 @@ work/<slug>/output/第九回_鐵槍破犁/
 ```
 ├── book_run.py                 ← Resolve --book, sidecar JSON, work/<slug>/ paths
 ├── data/*.pdf                  ← Source PDFs (gitignored unless you force-add)
-├── data/<stem>.book.json       ← Optional per-PDF overrides (same stem as PDF)
-├── config.py                   ← Global defaults (tunable settings)
+├── configs/books/<stem>.json   ← Optional per-PDF overrides (same stem as PDF)
+├── configs/config.py           ← Global defaults (tunable settings)
 ├── extract_pages.py            ← PDF → page JPEGs
 ├── split_page.py               ← Split double-wide pages left/right
 ├── ocr_text.py                 ← PaddleOCR (runs on AutoDL GPU)
@@ -63,6 +63,12 @@ work/<slug>/output/第九回_鐵槍破犁/
 python main_local.py --book jiang-yun-xing.pdf
 ```
 
+Resume from split only (reuse existing `tmp_pages`):
+
+```bash
+python main_local.py --book jiang-yun-xing.pdf --start-step 2
+```
+
 Artifacts: `work/jiang-yun-xing/tmp_pages/`, `work/jiang-yun-xing/tmp_crops/`, `work/jiang-yun-xing/crops_left.zip`.
 
 ### Phase 2 — OCR (AutoDL GPU)
@@ -74,7 +80,7 @@ Upload the zip to an [AutoDL](https://autodl.com) GPU instance:
 ```bash
 # On local machine — use this book’s zip path, e.g.:
 scp -P 52290 work/jiang-yun-xing/crops_left.zip \
-  main_autodl.py ocr_text.py config.py upscale.py \
+  main_autodl.py ocr_text.py configs/config.py upscale.py \
   root@connect.westb.seetacloud.com:/root/
 
 # On AutoDL instance
@@ -137,7 +143,7 @@ work/<slug>/output/
 
 ## Optional Enhancements
 
-- **Auto-upscale:** Set `UPSCALE_ENABLED = True` in `config.py` — Real-ESRGAN will upscale illustrations 4× on AutoDL.
+- **Auto-upscale:** Set `UPSCALE_ENABLED = True` in `configs/config.py` — Real-ESRGAN will upscale illustrations 4× on AutoDL.
 - **Claude API translation:** Replace `translate.py` with an LLM call for more natural Simplified Chinese (literary idioms).
 - **Image-to-video prompts:** Auto-generate prompt files alongside each illustration based on chapter text summary.
 - **Resume support:** Skip already-processed folders if the pipeline crashes mid-run.

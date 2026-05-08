@@ -6,7 +6,7 @@ Processes: OCR on left crops only (ocr_only_v1).
 import sys
 from pathlib import Path
 from PIL import Image
-from config import AUTODL_REMOTE_DIR, AUTODL_OUTPUT_DIR
+from configs.config import AUTODL_REMOTE_DIR, AUTODL_OUTPUT_DIR
 
 CROPS_DIR = Path(AUTODL_REMOTE_DIR)
 OUT_DIR = Path(AUTODL_OUTPUT_DIR)

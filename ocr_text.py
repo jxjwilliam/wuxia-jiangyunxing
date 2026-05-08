@@ -6,7 +6,7 @@ Runs on AutoDL with GPU, or locally on M3 (see config).
 from paddleocr import PaddleOCR
 from PIL import Image
 import numpy as np
-from config import OCR_LANG, OCR_USE_GPU
+from configs.config import OCR_LANG, OCR_USE_GPU
 
 
 _ocr = None

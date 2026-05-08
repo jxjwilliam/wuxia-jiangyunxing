@@ -1,0 +1,135 @@
+"""Wuxia project configuration: common defaults + per-book merged settings."""
+
+from __future__ import annotations
+
+import json
+from dataclasses import dataclass
+from pathlib import Path
+
+# Common defaults shared by all books.
+START_PAGE = 6
+END_PAGE = -2
+SPLIT_RATIO = 0.5
+WORK_ROOT_BASE = "work"
+OUTPUT_SUBDIR = "output"
+
+# OCR (works on both local M3 and AutoDL GPU)
+OCR_LANG = "chinese_cht"
+OCR_USE_GPU = False
+
+# Translation (Traditional → Simplified Chinese)
+OPENCC_CONFIG = "t2s"
+
+# Image output
+IMAGE_FORMAT = "PNG"
+IMAGE_DPI = 300
+
+# Upscaling (optional — AutoDL only; requires realesrgan)
+UPSCALE_ENABLED = False
+UPSCALE_FACTOR = 4
+
+# Fallback folder name when no chapter title detected
+FOLDER_FALLBACK = "page_{page_num:03d}"
+
+# Hybrid workflow paths (AutoDL side stays shared)
+AUTODL_REMOTE_DIR = "/root/wuxia_crops"
+AUTODL_OUTPUT_DIR = "/root/wuxia_output"
+
+
+@dataclass(frozen=True)
+class BookRuntimeConfig:
+    pdf_path: Path
+    slug: str
+    start_page: int
+    end_page: int | None
+    split_ratio: float
+    work_root: Path
+    tmp_pages: Path
+    tmp_crops: Path
+    tmp_results: Path
+    output_dir: Path
+    crops_zip: Path
+
+
+def sanitize_slug(stem: str) -> str:
+    stem = stem.replace("\0", "_").replace("/", "_").replace("\\", "_")
+    stem = stem.strip()
+    return stem or "book"
+
+
+def resolve_book_argument(book: str, *, cwd: Path | None = None) -> Path:
+    base = Path.cwd() if cwd is None else cwd
+    p = Path(book)
+    if len(p.parts) == 1 and not p.is_absolute():
+        candidate = (base / "data" / book).resolve()
+    else:
+        candidate = p.resolve() if p.is_absolute() else (base / p).resolve()
+    if not candidate.is_file():
+        raise ValueError(f"PDF not found: {candidate}")
+    if candidate.suffix.lower() != ".pdf":
+        raise ValueError(f"Not a PDF file (.pdf): {candidate}")
+    return candidate
+
+
+def _book_config_path(pdf_path: Path, *, cwd: Path | None = None) -> Path:
+    base = Path.cwd() if cwd is None else cwd
+    return base / "configs" / "books" / f"{pdf_path.stem}.json"
+
+
+def load_book_overrides(pdf_path: Path, *, cwd: Path | None = None) -> dict:
+    sidecar = _book_config_path(pdf_path, cwd=cwd)
+    legacy_sidecar = pdf_path.parent / f"{pdf_path.stem}.book.json"
+    if not sidecar.is_file() and legacy_sidecar.is_file():
+        sidecar = legacy_sidecar
+    if not sidecar.is_file():
+        return {}
+    try:
+        data = json.loads(sidecar.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in {sidecar}: {e}") from e
+    if not isinstance(data, dict):
+        raise ValueError(f"{sidecar} must be a JSON object")
+    return data
+
+
+def _coerce_path(value: str | None, *, base: Path) -> Path | None:
+    if value is None:
+        return None
+    p = Path(value)
+    return p if p.is_absolute() else (base / p).resolve()
+
+
+def build_book_runtime_config(book: str, *, cwd: Path | None = None) -> BookRuntimeConfig:
+    base = Path.cwd() if cwd is None else cwd
+    resolved_pdf = resolve_book_argument(book, cwd=base)
+    overrides = load_book_overrides(resolved_pdf, cwd=base)
+
+    override_pdf = overrides.get("pdf_path")
+    if override_pdf:
+        resolved_pdf = resolve_book_argument(str(override_pdf), cwd=base)
+
+    slug = sanitize_slug(str(overrides.get("slug", resolved_pdf.stem)))
+    default_work_root = (base / WORK_ROOT_BASE / slug).resolve()
+    work_root = _coerce_path(overrides.get("work_root"), base=base) or default_work_root
+
+    default_output_dir = work_root / OUTPUT_SUBDIR
+    output_dir = _coerce_path(overrides.get("output_dir"), base=base) or default_output_dir
+
+    start_page = int(overrides.get("start_page", START_PAGE))
+    end_raw = overrides.get("end_page", END_PAGE)
+    end_page = None if end_raw is None else int(end_raw)
+    split_ratio = float(overrides.get("split_ratio", SPLIT_RATIO))
+
+    return BookRuntimeConfig(
+        pdf_path=resolved_pdf,
+        slug=slug,
+        start_page=start_page,
+        end_page=end_page,
+        split_ratio=split_ratio,
+        work_root=work_root,
+        tmp_pages=work_root / "tmp_pages",
+        tmp_crops=work_root / "tmp_crops",
+        tmp_results=work_root / "tmp_results",
+        output_dir=output_dir,
+        crops_zip=work_root / "crops_left.zip",
+    )

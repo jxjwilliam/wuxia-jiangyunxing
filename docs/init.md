@@ -50,7 +50,7 @@ So the split is intentional:
 
 | Where | Role |
 |--------|------|
-| **Local** | PDF → page images → left/right crops, packaging, OpenCC 繁→简, chapter detection, `wuxia/` assembly |
+| **Local** | PDF → page images → left/right crops, packaging, OpenCC 繁→简, chapter detection, `work/<slug>/output/` assembly |
 | **AutoDL** | PaddleOCR on left crops (GPU), one `ocr_text.txt` per page |
 
 AutoDL is **pay-per-hour GPU**; for a one-off book run it is often cheaper in **elapsed time** than long CPU OCR on a laptop.

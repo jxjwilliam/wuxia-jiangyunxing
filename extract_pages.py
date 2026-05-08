@@ -4,7 +4,7 @@ Rasterise each PDF page to a high-res JPEG using PyMuPDF.
 """
 import fitz
 from pathlib import Path
-from config import IMAGE_DPI
+from configs.config import IMAGE_DPI
 
 
 def extract_pages(

@@ -44,15 +44,26 @@ def _find_local_right_crop(page_num: int, crops_dir: Path) -> Path | None:
     return None
 
 
-def phase1_preprocess(run: book_run.ResolvedRun, *, book_arg: str):
-    """Extract PDF pages and split into left/right crops."""
-    from extract_pages import extract_pages
-    from split_page import split_page
+def _existing_extracted_pages(tmp_pages_dir: Path) -> list[tuple[int, Path]]:
+    pages: list[tuple[int, Path]] = []
+    for img_path in sorted(tmp_pages_dir.glob("page_*.jpg")):
+        page_num = _extract_page_num(img_path.stem)
+        if page_num is not None:
+            pages.append((page_num, img_path))
+    return pages
 
-    print("=" * 50)
-    print("PHASE 1: Local Preprocessing")
-    print("=" * 50)
-    print(f"Book: {run.pdf_path}  →  work/{run.slug}/")
+
+def _phase1_pages(run: book_run.ResolvedRun, *, start_step: int):
+    from extract_pages import extract_pages
+
+    if start_step == 2:
+        pages = _existing_extracted_pages(run.tmp_pages)
+        if not pages:
+            print(f"❌ start-step=2 but no extracted pages found in {run.tmp_pages}/.")
+            print("Run with --start-step 1 first to generate tmp_pages.")
+            sys.exit(1)
+        print(f"\nStep 1 skipped (--start-step 2). Reusing {len(pages)} pages from {run.tmp_pages}/")
+        return pages
 
     print("\nStep 1: Extracting page images from PDF...")
     pages = extract_pages(
@@ -62,6 +73,19 @@ def phase1_preprocess(run: book_run.ResolvedRun, *, book_arg: str):
         end_page=run.end_page,
     )
     print(f"  → {len(pages)} pages extracted to {run.tmp_pages}/")
+    return pages
+
+
+def phase1_preprocess(run: book_run.ResolvedRun, *, book_arg: str, start_step: int = 1):
+    """Extract PDF pages and split into left/right crops."""
+    from split_page import split_page
+
+    print("=" * 50)
+    print("PHASE 1: Local Preprocessing")
+    print("=" * 50)
+    print(f"Book: {run.pdf_path}  →  work/{run.slug}/")
+
+    pages = _phase1_pages(run, start_step=start_step)
 
     print("\nStep 2: Splitting pages into left/right crops...")
     run.tmp_crops.mkdir(parents=True, exist_ok=True)
@@ -188,9 +212,9 @@ def phase3_assemble(run: book_run.ResolvedRun):
     print(f"   Output in {run.output_dir}/ ({out_count} folders)")
 
 
-def run_all(run: book_run.ResolvedRun, *, book_arg: str):
+def run_all(run: book_run.ResolvedRun, *, book_arg: str, start_step: int = 1):
     """Run Phase 1 + Phase 3 (if results already exist)."""
-    phase1_preprocess(run, book_arg=book_arg)
+    phase1_preprocess(run, book_arg=book_arg, start_step=start_step)
     if run.tmp_results.exists() and any(run.tmp_results.iterdir()):
         print("\n" + "-" * 50)
         phase3_assemble(run)
@@ -216,6 +240,13 @@ def main() -> None:
         action="store_true",
         help="Run Phase 1, then Phase 3 if tmp_results/ for this book exists.",
     )
+    parser.add_argument(
+        "--start-step",
+        type=int,
+        choices=(1, 2),
+        default=1,
+        help="Phase 1 start step: 1=extract then split, 2=skip extract and split from existing tmp_pages.",
+    )
     args = parser.parse_args()
     try:
         pdf_path = book_run.resolve_book_argument(args.book)
@@ -225,11 +256,11 @@ def main() -> None:
     run = book_run.build_resolved_run(pdf_path)
 
     if args.all:
-        run_all(run, book_arg=args.book)
+        run_all(run, book_arg=args.book, start_step=args.start_step)
     elif args.phase3:
         phase3_assemble(run)
     else:
-        phase1_preprocess(run, book_arg=args.book)
+        phase1_preprocess(run, book_arg=args.book, start_step=args.start_step)
 
 
 if __name__ == "__main__":

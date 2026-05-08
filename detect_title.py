@@ -3,7 +3,7 @@ Step 5: Detect chapter title from OCR text.
 Looks for the 第X回 pattern (e.g. 第九回_鐵槍破犁).
 """
 import re
-from config import FOLDER_FALLBACK
+from configs.config import FOLDER_FALLBACK
 
 # Matches: 第九回, 第十二回, 第一百回, etc.
 CHAPTER_PATTERN = re.compile(

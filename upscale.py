@@ -8,7 +8,7 @@ import cv2
 from PIL import Image
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from realesrgan import RealESRGANer
-from config import UPSCALE_FACTOR
+from configs.config import UPSCALE_FACTOR
 
 # weights/RealESRGAN_x4plus_anime_6B.pth is a 4× model; RRDBNet.scale must match the checkpoint.
 _UPSCALE_CHECKPOINT_SCALE = 4

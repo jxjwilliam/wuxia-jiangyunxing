@@ -1,0 +1,7 @@
+{
+  "pdf_path": "data/41-定军山.PDF",
+  "output_dir": "work/41-定军山/output",
+  "start_page": 7,
+  "end_page": -4,
+  "split_ratio": 0.20
+}

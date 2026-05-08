@@ -1,0 +1,7 @@
+{
+  "pdf_path": "data/14-煮酒论英雄.PDF",
+  "output_dir": "work/14-煮酒论英雄/output",
+  "start_page": 7,
+  "end_page": -3,
+  "split_ratio": 0.20
+}

@@ -2,7 +2,7 @@
 
 ## Project
 
-Extract text and images from **姜云行金庸作品插画集** (`data/jiang-yun-xing.pdf`), a 214-page Chinese wuxia comic PDF. Each page has Traditional Chinese text (left) and a comic illustration (right).
+Extract text and images from Chinese comic PDFs (e.g. **姜云行金庸作品插画集** at `data/jiang-yun-xing.pdf`). Each page has Traditional Chinese text (left) and a comic illustration (right).
 
 ## Approach: Hybrid Local + Cloud GPU
 
@@ -18,7 +18,7 @@ The pipeline is split into 3 phases to maximize efficiency — CPU-bound work ru
 
 | File | Purpose |
 |---|---|
-| `config.py` | All settings: paths, flags, thresholds |
+| `configs/config.py` | Common defaults + per-book JSON merge (`configs/books/<stem>.json`) |
 | `extract_pages.py` | PyMuPDF rasterisation (300 DPI) |
 | `split_page.py` | Pillow midpoint crop |
 | `ocr_text.py` | PaddleOCR module (GPU on AutoDL) |
@@ -67,10 +67,12 @@ PaddleOCR on GPU delivers the best accuracy for vertical Traditional Chinese and
 
 ## What's Next
 
-1. **Upload** `crops_left.zip` and `crops_right.zip` to AutoDL
+1. **Upload** `work/<slug>/crops_left.zip` to AutoDL
 2. **Run** `python main_autodl.py` on the GPU instance
-3. **Download** AutoDL results to `tmp_results/`
-4. **Run** `python main_local.py --phase3` to produce the final `wuxia/` output
+3. **Download** AutoDL results to `work/<slug>/tmp_results/`
+4. **Run** `python main_local.py --book <book>.pdf --phase3` to produce final `work/<slug>/output/`
+
+Tip: `python main_local.py --book <book>.pdf --start-step 2` skips extraction and re-splits from existing `tmp_pages`.
 
 ## Related Documents
 

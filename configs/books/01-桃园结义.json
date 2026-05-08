@@ -1,0 +1,7 @@
+{
+  "pdf_path": "data/01-桃园结义.PDF",
+  "output_dir": "work/01-桃园结义/output",
+  "start_page": 7,
+  "end_page": -3,
+  "split_ratio": 0.20
+}

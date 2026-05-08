@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -47,18 +48,43 @@ class TestLoadBookOverrides(unittest.TestCase):
             pdf.write_bytes(b"x")
             self.assertEqual(book_run.load_book_overrides(pdf), {})
 
-    def test_partial_merge(self):
+    def test_partial_merge_from_configs_folder(self):
         with tempfile.TemporaryDirectory() as td:
-            d = Path(td) / "data"
-            d.mkdir()
+            root = Path(td)
+            d = root / "data"
+            d.mkdir(parents=True)
             pdf = d / "m.pdf"
             pdf.write_bytes(b"x")
-            side = d / "m.book.json"
+            cfg_dir = root / "configs" / "books"
+            cfg_dir.mkdir(parents=True)
+            side = cfg_dir / "m.json"
             side.write_text(json.dumps({"start_page": 10, "split_ratio": 0.48}), encoding="utf-8")
-            o = book_run.load_book_overrides(pdf)
+            old_cwd = Path.cwd()
+            try:
+                os.chdir(root)
+                o = book_run.load_book_overrides(pdf)
+            finally:
+                os.chdir(old_cwd)
             self.assertEqual(o["start_page"], 10)
             self.assertEqual(o["split_ratio"], 0.48)
             self.assertNotIn("end_page", o)
+
+    def test_legacy_data_sidecar_fallback(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            d = root / "data"
+            d.mkdir(parents=True)
+            pdf = d / "legacy.pdf"
+            pdf.write_bytes(b"x")
+            side = d / "legacy.book.json"
+            side.write_text(json.dumps({"split_ratio": 0.42}), encoding="utf-8")
+            old_cwd = Path.cwd()
+            try:
+                os.chdir(root)
+                o = book_run.load_book_overrides(pdf)
+            finally:
+                os.chdir(old_cwd)
+            self.assertEqual(o["split_ratio"], 0.42)
 
 
 class TestBuildResolvedRunLayout(unittest.TestCase):

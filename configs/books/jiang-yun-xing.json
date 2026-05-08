@@ -1,0 +1,7 @@
+{
+  "pdf_path": "data/jiang-yun-xing.pdf",
+  "output_dir": "work/jiang-yun-xing/output",
+  "start_page": 6,
+  "end_page": -2,
+  "split_ratio": 0.5
+}
