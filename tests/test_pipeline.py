@@ -97,6 +97,14 @@ class TestSplitPage(unittest.TestCase):
             split_page.split_page(buf)
             self.assertIsNone(split_page.Image.MAX_IMAGE_PIXELS)
 
+    def test_apply_crop_margins_ignores_bottom_key(self):
+        img = Image.new("RGB", (100, 50), color=(255, 255, 255))
+        out = split_page.apply_crop_margins(
+            img, {"top": 0.1, "left": 0.1, "right": 0.1, "bottom": 0.5}
+        )
+        # bottom is intentionally ignored now; only top/left/right apply.
+        self.assertEqual(out.size, (80, 45))
+
 
 if __name__ == "__main__":
     unittest.main()

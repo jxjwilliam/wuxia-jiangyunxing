@@ -34,6 +34,7 @@ class ResolvedRun:
     crops_zip: Path
     ocr_left_crop: dict[str, float | int] | None
     ocr_rotate_left_cw90: bool
+    pdf_extract_mode: str
 
 
 def build_resolved_run(pdf_path: Path, *, cwd: Path | None = None) -> ResolvedRun:
@@ -52,4 +53,5 @@ def build_resolved_run(pdf_path: Path, *, cwd: Path | None = None) -> ResolvedRu
         crops_zip=runtime.crops_zip,
         ocr_left_crop=runtime.ocr_left_crop,
         ocr_rotate_left_cw90=runtime.ocr_rotate_left_cw90,
+        pdf_extract_mode=runtime.pdf_extract_mode,
     )

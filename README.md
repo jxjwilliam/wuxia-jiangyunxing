@@ -71,6 +71,14 @@ python main_local.py --book jiang-yun-xing.pdf --start-step 2
 
 Artifacts: `work/jiang-yun-xing/tmp_pages/`, `work/jiang-yun-xing/tmp_crops/`, `work/jiang-yun-xing/crops_left.zip`.
 
+**Local single-image OCR smoke test** (needs a venv with `paddleocr` + `paddlepaddle`, same as AutoDL):
+
+```bash
+python ocr_one.py --cpu --rotate work/01-桃园结义/tmp_crops/page_008_left.jpg
+# --rotate matches 连环画 `phase2_manifest` (vertical strip). Omit for horizontal panels.
+# --simplified uses OpenCC after OCR (optional).
+```
+
 ### Phase 2 — OCR (AutoDL GPU)
 
 **Before each new book on the same instance:** empty `/root/wuxia_crops/` and `/root/wuxia_output/` so crops and OCR from two PDFs never mix.

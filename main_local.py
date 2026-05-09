@@ -72,6 +72,7 @@ def _phase1_pages(run: book_run.ResolvedRun, *, start_step: int):
         run.tmp_pages,
         start_page=run.start_page,
         end_page=run.end_page,
+        pdf_extract_mode=run.pdf_extract_mode,
     )
     print(f"  → {len(pages)} pages extracted to {run.tmp_pages}/")
     return pages
@@ -132,7 +133,10 @@ def phase3_assemble(run: book_run.ResolvedRun):
     print("=" * 50)
 
     if not run.tmp_results.exists():
-        print(f"❌ {run.tmp_results}/ not found. Download AutoDL results first.")
+        print("❌ Phase 3 requires Phase 2 output (AutoDL OCR). Missing directory:")
+        print(f"   {run.tmp_results.resolve()}")
+        print("   Create it by downloading/unzipping wuxia_output into tmp_results/")
+        print("   (see download_results.py). Then re-run --phase3.")
         sys.exit(1)
 
     if not run.tmp_crops.exists():

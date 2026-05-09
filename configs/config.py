@@ -20,6 +20,15 @@ OCR_RETRY_WITH_ENHANCEMENT = True
 OCR_OUTPUT_SIMPLIFIED = True
 # Larger than default 960: 300 DPI left crops are tall; too-small limit hurts vertical 繁体.
 OCR_DET_LIMIT_SIDE_LEN = 2048
+# PaddleOCR 3 / PaddleX only. Doc orientation + UVDoc unwarp helps phone photos of curved paper;
+# for flat PDF / 连环画 crops it often hurts text and is slow on CPU.
+OCR_PADDLEX_USE_DOC_PREPROCESSOR = False
+# If > 0: LANCZOS downscale longest edge before Paddle (OOM guard). Default 0 = full res for GPU servers.
+# ocr_one.py --cpu defaults this to 4480 when unset.
+OCR_MAX_INPUT_LONG_SIDE = 0
+# When OCR_USE_GPU is False: PP-OCRv5 server det/rec + custom PaddleX YAML OOM‑kills on many laptops.
+# Prefer PP-OCRv3 mobile (still chinese_cht) for local smoke tests; AutoDL GPU unchanged.
+OCR_CPU_USE_LITE_MODELS = True
 
 # Translation (Traditional → Simplified Chinese)
 OPENCC_CONFIG = "t2s"
@@ -27,6 +36,14 @@ OPENCC_CONFIG = "t2s"
 # Image output
 IMAGE_FORMAT = "PNG"
 IMAGE_DPI = 300
+
+# PDF Step 1: embedded bitmap vs full-page render (see extract_pages.py)
+# If embedded width / (page_pt_width/72) is below threshold, pixmap @ IMAGE_DPI is mostly
+# interpolation blur for "screen JPG in letterbox PDF" pages; extract native JPEG instead.
+EXTRACT_EMBEDDED_EFFECTIVE_DPI_THRESHOLD = 80.0
+EXTRACT_EMBEDDED_TARGET_LONG_SIDE = 2700
+# Default when book sidecar omits pdf_extract_mode: auto | render | embedded_native
+PDF_EXTRACT_MODE_DEFAULT = "auto"
 
 # Upscaling (optional — AutoDL only; requires realesrgan)
 UPSCALE_ENABLED = False
@@ -58,6 +75,7 @@ class BookRuntimeConfig:
     crops_zip: Path
     ocr_left_crop: dict[str, float | int] | None
     ocr_rotate_left_cw90: bool
+    pdf_extract_mode: str
 
 
 def write_phase2_manifest(tmp_crops: Path, *, ocr_rotate_left_cw90: bool) -> None:
@@ -143,7 +161,20 @@ def build_book_runtime_config(book: str, *, cwd: Path | None = None) -> BookRunt
     ocr_left_crop = overrides.get("ocr_left_crop")
     if ocr_left_crop is not None and not isinstance(ocr_left_crop, dict):
         raise ValueError("ocr_left_crop must be a JSON object when provided")
+    if isinstance(ocr_left_crop, dict):
+        allowed = {"top", "left", "right"}
+        extra = sorted(set(ocr_left_crop) - allowed)
+        if extra:
+            raise ValueError(
+                f"ocr_left_crop only supports top/left/right; unsupported keys: {', '.join(extra)}"
+            )
     ocr_rotate_left_cw90 = bool(overrides.get("ocr_rotate_left_cw90", False))
+
+    pdf_extract_mode = str(overrides.get("pdf_extract_mode", PDF_EXTRACT_MODE_DEFAULT)).strip().lower()
+    if pdf_extract_mode not in ("auto", "render", "embedded_native"):
+        raise ValueError(
+            f"pdf_extract_mode must be auto, render, or embedded_native (got {pdf_extract_mode!r})"
+        )
 
     return BookRuntimeConfig(
         pdf_path=resolved_pdf,
@@ -159,4 +190,5 @@ def build_book_runtime_config(book: str, *, cwd: Path | None = None) -> BookRunt
         crops_zip=work_root / "crops_left.zip",
         ocr_left_crop=ocr_left_crop,
         ocr_rotate_left_cw90=ocr_rotate_left_cw90,
+        pdf_extract_mode=pdf_extract_mode,
     )

@@ -86,6 +86,23 @@ class TestLoadBookOverrides(unittest.TestCase):
             run = book_run.build_resolved_run(pdf, cwd=root)
             self.assertEqual(run.ocr_left_crop, {"top": 0.12, "left": 0.2})
 
+    def test_ocr_left_crop_bottom_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            d = root / "data"
+            d.mkdir(parents=True)
+            pdf = d / "crop2.pdf"
+            pdf.write_bytes(b"x")
+            cfg_dir = root / "configs" / "books"
+            cfg_dir.mkdir(parents=True)
+            side = cfg_dir / "crop2.json"
+            side.write_text(
+                json.dumps({"ocr_left_crop": {"top": 0.12, "bottom": 0.2}}),
+                encoding="utf-8",
+            )
+            with self.assertRaises(ValueError):
+                book_run.build_resolved_run(pdf, cwd=root)
+
     def test_legacy_data_sidecar_fallback(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -122,6 +139,39 @@ class TestBuildResolvedRunLayout(unittest.TestCase):
             self.assertEqual(run.crops_zip, root / "work" / "jiang" / "crops_left.zip")
             self.assertIsNone(run.ocr_left_crop)
             self.assertFalse(run.ocr_rotate_left_cw90)
+            self.assertEqual(run.pdf_extract_mode, "auto")
+
+    def test_pdf_extract_mode_from_sidecar(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            data = root / "data"
+            data.mkdir(parents=True)
+            pdf = data / "xm.pdf"
+            pdf.write_bytes(b"x")
+            cfg_dir = root / "configs" / "books"
+            cfg_dir.mkdir(parents=True)
+            (cfg_dir / "xm.json").write_text(
+                json.dumps({"pdf_extract_mode": "render"}),
+                encoding="utf-8",
+            )
+            run = book_run.build_resolved_run(pdf, cwd=root)
+            self.assertEqual(run.pdf_extract_mode, "render")
+
+    def test_invalid_pdf_extract_mode_raises(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            data = root / "data"
+            data.mkdir(parents=True)
+            pdf = data / "bad.pdf"
+            pdf.write_bytes(b"x")
+            cfg_dir = root / "configs" / "books"
+            cfg_dir.mkdir(parents=True)
+            (cfg_dir / "bad.json").write_text(
+                json.dumps({"pdf_extract_mode": "oops"}),
+                encoding="utf-8",
+            )
+            with self.assertRaises(ValueError):
+                book_run.build_resolved_run(pdf, cwd=root)
 
     def test_ocr_rotate_left_cw90_from_sidecar(self):
         with tempfile.TemporaryDirectory() as td:
