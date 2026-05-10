@@ -62,3 +62,28 @@ scp -P 46840 work/01-桃园结义/crops_left.zip  root@connect.cqa1.seetacloud.c
 scp -P 46840 work/14-煮酒论英雄/crops_left.zip  root@connect.cqa1.seetacloud.com:/root/
 scp -P 46840 work/41-定军山/crops_left.zip  root@connect.cqa1.seetacloud.com:/root/
 ```
+
+```
+scp -P 46840 work/01-桃园结义/crops_left.zip root@connect.cqa1.seetacloud.com:/root/
+```
+
+### 术语解释
+
+- DPI：Dots Per Inch（每英寸点数），图像清晰度的核心指标，数值越低画面越模糊。
+- 置信度（confidence）：OCR/VLM 识别结果的可信度评分，分数越低代表识别结果越不可靠。
+- 回退方案（fallback）：主流程失败时自动触发的备用处理逻辑，保证整体任务不中断。
+- VLM：Vision-Language Model（视觉语言模型），兼具图像理解与文本生成能力的多模态大模型，对低质量文本的识别鲁棒性远强于传统 OCR。
+- Real-ESRGAN：开源 AI 超分辨率模型，专门用于修复低分辨率、低质量图像。
+PaddleOCR PP-OCRv5：百度开源的工业级 OCR 工具，对常规文本识别效率高，但对极低质量扫描件的容错能力有限。
+- AutoDL：国内主流的 GPU 算力租赁平台，常被用于本地模型推理与 AI 任务部署。
+
+
+### Low DPI
+
+当处理流水线检测到低 DPI / 置信度低的页面时，以下哪类引擎适合作为回退方案（fallback）？**选项**
+
+- (A) 纯本地方案：添加 Real-ESRGAN 超分辨率增强，然后重试 PaddleOCR PP-OCRv5 服务。全程不调用任何外部 API。（效果提升有限；当 DPI≤30 时仍可能失败。）
+- (B) 调用 API 的云端 VLM 方案：例如通义千问 VL-Max（DashScope 平台）、GPT-4o 视觉版、Claude 视觉版。对低质量扫描件识别准确率最高；需要 API 密钥 + 按页计费；AutoDL 平台需开通出站 HTTPS 访问权限。
+- (C) 分层混合方案：先执行本地超分辨率 + OCR 识别，仅当置信度仍低于阈值时，再调用 VLM（在保证准确率的前提下，成本最低）。
+- (D) 本地 VLM 方案：在 AutoDL 的 GPU 上直接运行通义千问 VL 或 InternVL 模型（无按次调用成本；但需下载大体积模型文件，且需要额外的显存余量）。
+- (E) 不新增引擎方案：仅检测 + 告警 + 跳过该页，生成占位符，由用户手动转录文本。

@@ -5,8 +5,8 @@
   "end_page": -3,
   "split_ratio": 0.2,
   "ocr_left_crop": {
-    "top": 0.13,
-    "left": 0.22,
+    "top": 0.05,
+    "left": 0.18,
     "right": 0.02
   },
   "ocr_rotate_left_cw90": true

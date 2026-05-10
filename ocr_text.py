@@ -547,6 +547,31 @@ def _suppress_bottom_background(img: Image.Image) -> Image.Image:
     return img.crop((0, 0, w, cutoff)).copy()
 
 
+def _choose_ocr_result(
+    *,
+    base_text: str,
+    base_conf: float,
+    base_cjk: int,
+    enhanced_text: str,
+    enhanced_conf: float,
+    enhanced_cjk: int,
+) -> str:
+    """Pick base vs enhanced OCR output, penalising enhanced runs that inject non-CJK noise.
+
+    `_enhance_for_ocr` boosts contrast which can make PaddleOCR confidently mis-recognise
+    border/seal artefacts as digits/letters. The garbage budget below rejects an enhanced
+    win when its non-CJK character count grew by more than 2 over the base output.
+    """
+    base_garbage = len(base_text) - base_cjk
+    enhanced_garbage = len(enhanced_text) - enhanced_cjk
+
+    if enhanced_conf > base_conf + 0.10 and enhanced_garbage <= base_garbage + 2:
+        return enhanced_text
+    if enhanced_cjk > base_cjk + 8 and enhanced_garbage <= base_garbage + 2:
+        return enhanced_text
+    return base_text
+
+
 def ocr_image(pil_image: Image.Image) -> str:
     rotate_cw90 = bool(_phase2_manifest.get("ocr_rotate_left_cw90"))
     reading_order = "horizontal_tb_lr" if rotate_cw90 else "vertical_rl_tt"
@@ -578,8 +603,11 @@ def ocr_image(pil_image: Image.Image) -> str:
     enhanced_text, enhanced_conf = _ocr_once(ocr, enhanced_arr, reading_order=reading_order)
     enhanced_cjk = _count_cjk(enhanced_text)
 
-    if enhanced_conf > base_conf + 0.03:
-        return enhanced_text
-    if enhanced_cjk > base_cjk + 8:
-        return enhanced_text
-    return base_text
+    return _choose_ocr_result(
+        base_text=base_text,
+        base_conf=base_conf,
+        base_cjk=base_cjk,
+        enhanced_text=enhanced_text,
+        enhanced_conf=enhanced_conf,
+        enhanced_cjk=enhanced_cjk,
+    )

@@ -83,6 +83,8 @@ python ocr_one.py --cpu --rotate work/01-桃园结义/tmp_crops/page_008_left.jp
 
 **Before each new book on the same instance:** empty `/root/wuxia_crops/` and `/root/wuxia_output/` so crops and OCR from two PDFs never mix.
 
+**After pulling OCR fixes (e.g. crop-margin or `_choose_ocr_result` changes):** re-run Phase 1 locally for any 连环画 book (`01-桃园结义`, `14-煮酒论英雄`, `41-定军山`) and re-upload the fresh `crops_left.zip` — existing crops on the AutoDL instance were generated under the old margins.
+
 Upload the zip to an [AutoDL](https://autodl.com) GPU instance:
 
 ```bash
